@@ -24,6 +24,7 @@
         .die.force { background: #eeeeee; }
 
         .history { border-top: dashed 1px black; margin-top: 8px; padding-top: 8px; }
+        .history-transition-move { transition: transform 1s; }
 
         .type { font-weight: bold; text-transform: capitalize; width: 100px; display: inline-block; }
     </style>
@@ -73,10 +74,12 @@
             <div class="col-md">
                 <div class="history">
                     <h2>History</h2>
-                    <div class="roll" v-for="roll in rolls.slice(0,historyLength)">
-                        <div><b>{{ roll.user }}</b> — {{ timeSince(roll.time) }} — <rolleddie v-bind:die="die" v-for="die in roll.dice"></rolleddie></div>
-                        <div><resultdie v-bind:die="die" v-for="die in calculateResults(roll.dice)"></resultdie></div>
-                    </div>
+                    <transition-group name="history-transition" tag="div">
+                        <div class="roll" v-for="roll in rolls.slice(0,historyLength)" v-bind:key="roll.time">
+                            <div><b>{{ roll.user }}</b> — {{ timeSince(roll.time) }} — <rolleddie v-bind:die="die" v-for="die in roll.dice"></rolleddie></div>
+                            <div><resultdie v-bind:die="die" v-for="die in calculateResults(roll.dice)"></resultdie></div>
+                        </div>
+                    </transition-group>
                 </div>
             </div>
         </div>
