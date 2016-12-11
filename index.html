@@ -14,6 +14,7 @@
         .die img { display: block; }
         .die.rolled { width: 12px; height: 12px; margin-right: 2px; }
         .die.toRoll { width: 24px; height: 24px; cursor: pointer; }
+        .die.toRoll.active { box-shadow: inset 4px 4px 4px #333; }
 
         .die.ability { background: green; }
         .die.proficiency { background: yellow; }
@@ -45,8 +46,8 @@
                     <h3>To roll</h3>
 
                     <div v-for="type in types">
-                        <span class="type">{{ type }}:</span>
-                        <div class="die toRoll" :class="type" @click="selectDice(type, i)" v-for="i in [1,2,3,4,5]"></div>
+                        <span class="type">{{ type.name }}:</span>
+                        <div class="die toRoll" :class="[ type.name, { active: isActive(type.value, i) }]" @click="selectDice(type, i)" v-for="i in [1,2,3,4,5]"></div>
                     </div>
 
                     <button class="btn rollButton" @click="doRoll">Roll!</button>
@@ -117,7 +118,15 @@
             data: {
                 name: "A New Hope",
                 historyLength: 2,
-                types : [ "ability", "proficiency", "boost", "challenge", "difficulty", "setback", "force" ],
+                types : [
+                    { name: "ability", value: 3 },
+                    { name: "proficiency", value: 0 },
+                    { name: "boost", value: 0 },
+                    { name: "challenge", value: 0 },
+                    { name: "difficulty", value: 0 },
+                    { name: "setback", value: 0 },
+                    { name: "force", value: 0 }
+                ],
                 rolls: [
                     {   user: "Inigo",
                         time: moment().subtract(2, 'minutes'),
@@ -153,6 +162,9 @@
                 }
             },
             methods: {
+                isActive: function(value, current) {
+                    return current <= value;
+                },
                 rollsFor: function(user) {
                     return this.rolls.filter(roll => roll.user === user)
                 },
@@ -190,7 +202,8 @@
                     this.rolls.unshift(newValue);
                 },
                 selectDice: function(type, i) {
-                    console.info("Select dice : "+type+" "+i);
+                    var newValue = (type.value === 1 && i === 1) ? 0 : i;
+                    type.value = newValue;
                 }
             }
         });
