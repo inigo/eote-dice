@@ -88,6 +88,7 @@
 
     <script src="javascript/vue.js"></script>
     <script src="javascript/moment.js"></script>
+    <script src="javascript/axios.min.js"></script>
 
     <script type="text/x-template" id="rolleddie-template">
         <div class='rolled die' :class='die.type' :title='die.type'>
@@ -192,14 +193,13 @@
                     return results;
                 },
                 doRoll: function() {
-                    var newValue = { user: "Inigo",
-                        time: Date.now(),
-                        dice: [
-                            { type: "advantage", pips: [ "success", "advantage" ] },
-                            { type: "force", pips: [ "darkside" ] }
-                        ]
-                    };
-                    this.rolls.unshift(newValue);
+                    var rolls = this.rolls;
+                    axios.post('/makeRoll', {
+                        value: this.types
+                    }).then(function (response) {
+                        console.log(response);
+                        rolls = response;
+                    });
                 },
                 selectDice: function(type, i) {
                     var newValue = (type.value === 1 && i === 1) ? 0 : i;
