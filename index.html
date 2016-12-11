@@ -12,6 +12,7 @@
     <style type="text/css">
         .die { width: 64px; height: 64px; border: solid 1px black; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; }
         .die img { display: block; }
+        .die.rolled { width: 12px; height: 12px; margin-right: 2px; }
 
         .die.advantage { background-image: url("images/results/advantage.svg") }
         .die.darkside { background-image: url("images/results/darkside.svg") }
@@ -58,6 +59,7 @@
                 <h2>Everyone's last result</h2>
                 <div class="user" v-for="user in users">
                     <h3>{{ user }}</h3>
+                    <div class="rolled"><rolleddie v-bind:die="die" v-for="die in rollsFor(user)[0].dice"></rolleddie></div>
                     <resultdie v-bind:die="roll" v-for="roll in calculateResults(rollsFor(user)[0].dice)"></resultdie>
                 </div>
             </div>
@@ -69,6 +71,7 @@
                     <h2>History</h2>
                     <div class="roll" v-for="roll in rolls.slice(0,historyLength)">
                         <div>{{ roll.user }} at {{ roll.time }}</div>
+                        <div class="rolled"><rolleddie v-bind:die="die" v-for="die in roll.dice"></rolleddie></div>
                         <div><resultdie v-bind:die="die" v-for="die in calculateResults(roll.dice)"></resultdie></div>
                     </div>
                 </div>
@@ -77,6 +80,11 @@
     </div>
 
     <script src="javascript/vue.js"></script>
+
+    <script type="text/x-template" id="rolleddie-template">
+        <div class='rolled die' :class='die.type'>
+        </div>
+    </script>
 
     <script type="text/x-template" id="resultdie-template">
         <div class='result die' :class='die'>
@@ -95,6 +103,11 @@
         Vue.component('resultdie', {
             props: ['die'],
             template: "#resultdie-template"
+        });
+
+        Vue.component('rolleddie', {
+            props: ['die'],
+            template: "#rolleddie-template"
         });
 
         Vue.component('rolldie', {
