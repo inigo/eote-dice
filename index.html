@@ -58,8 +58,7 @@
             <div class="col-sm">
                 <h2>Everyone's last result</h2>
                 <div class="user" v-for="user in users">
-                    <h3>{{ user }}</h3>
-                    <div class="rolled"><rolleddie v-bind:die="die" v-for="die in rollsFor(user)[0].dice"></rolleddie></div>
+                    <h3>{{ user }} <rolleddie v-bind:die="die" v-for="die in rollsFor(user)[0].dice"></rolleddie></h3>
                     <resultdie v-bind:die="roll" v-for="roll in calculateResults(rollsFor(user)[0].dice)"></resultdie>
                 </div>
             </div>
@@ -70,8 +69,7 @@
                 <div class="history">
                     <h2>History</h2>
                     <div class="roll" v-for="roll in rolls.slice(0,historyLength)">
-                        <div>{{ roll.user }} at {{ roll.time }}</div>
-                        <div class="rolled"><rolleddie v-bind:die="die" v-for="die in roll.dice"></rolleddie></div>
+                        <div><b>{{ roll.user }}</b> — {{ timeSince(roll.time) }} — <rolleddie v-bind:die="die" v-for="die in roll.dice"></rolleddie></div>
                         <div><resultdie v-bind:die="die" v-for="die in calculateResults(roll.dice)"></resultdie></div>
                     </div>
                 </div>
@@ -80,6 +78,7 @@
     </div>
 
     <script src="javascript/vue.js"></script>
+    <script src="javascript/moment.js"></script>
 
     <script type="text/x-template" id="rolleddie-template">
         <div class='rolled die' :class='die.type'>
@@ -122,7 +121,7 @@
                 historyLength: 2,
                 rolls: [
                     {   user: "Inigo",
-                        time: "Just now",
+                        time: moment().subtract(2, 'minutes'),
                         dice: [
                             { type: "ability", pips: [ "advantage", "advantage" ] },
                             { type: "ability", pips: [ "success" ] },
@@ -131,7 +130,7 @@
                         ]
                     },
                     {   user: "Inigo",
-                        time: "A little while ago",
+                        time: moment().subtract(10, 'minutes'),
                         dice: [
                             { type: "force", pips: [ "lightside", "lightside" ] },
                             { type: "force", pips: [ "darkside" ] },
@@ -140,7 +139,7 @@
                         ]
                     },
                     {   user: "Pete",
-                        time: "Longer ago",
+                        time: moment().subtract(66, 'minutes'),
                         dice: [
                             { type: "force", pips: [ "darkside", "darkside" ] },
                             { type: "force", pips: [ "darkside" ] }
@@ -157,6 +156,9 @@
             methods: {
                 rollsFor: function(user) {
                     return this.rolls.filter(roll => roll.user === user)
+                },
+                timeSince: function(time) {
+                    return moment(time).fromNow();
                 },
                 /* Convert a set of rolls into the aggregate result, cancelling successes with failures and so on. */
                 calculateResults: function(dice) {
