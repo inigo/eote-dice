@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -13,16 +13,19 @@
         .die { width: 64px; height: 64px; border: solid 1px black; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; }
         .die img { display: block; }
         .die.rolled { width: 12px; height: 12px; margin-right: 2px; }
+        .die.toRoll { width: 24px; height: 24px; cursor: pointer; }
 
         .die.ability { background: green; }
         .die.proficiency { background: yellow; }
         .die.boost { background: blue; }
         .die.challenge { background: red; }
         .die.difficulty { background: purple; }
-        .die.setback { background: darkgray; }
-        .die.force { background: lightgray; }
+        .die.setback { background: #666666; }
+        .die.force { background: #eeeeee; }
 
         .history { border-top: dashed 1px black; margin-top: 8px; padding-top: 8px; }
+
+        .type { font-weight: bold; text-transform: capitalize; width: 100px; display: inline-block; }
     </style>
 </head>
 <body>
@@ -37,7 +40,18 @@
             <div class="col-md currentResults">
                 <h2>Your current result</h2>
 
-                <div class="dice" id="currentResultsDisplay">
+                <div class="diceToRoll">
+                    <h3>To roll</h3>
+
+                    <div v-for="type in types">
+                        <span class="type">{{ type }}:</span>
+                        <div class="die toRoll" :class="type" @click="selectDice(type, i)" v-for="i in [1,2,3,4,5]"></div>
+                    </div>
+
+                    <button class="btn rollButton" @click="doRoll">Roll!</button>
+                </div>
+
+                <div class="dice">
                     <h3>Roll</h3>
                     <rolldie v-bind:die="die" v-for="die in rolls[0].dice"></rolldie>
 
@@ -91,26 +105,16 @@
     </script>
 
     <script type="text/javascript">
-        Vue.component('resultdie', {
-            props: ['die'],
-            template: "#resultdie-template"
-        });
-
-        Vue.component('rolleddie', {
-            props: ['die'],
-            template: "#rolleddie-template"
-        });
-
-        Vue.component('rolldie', {
-            props: ['die'],
-            template: "#rolldie-template"
-        });
+        Vue.component('resultdie', { props: ['die'], template: "#resultdie-template" });
+        Vue.component('rolleddie', { props: ['die'], template: "#rolleddie-template" });
+        Vue.component('rolldie', { props: ['die'], template: "#rolldie-template" });
 
         var vm = new Vue({
             el : "#root",
             data: {
                 name: "A New Hope",
                 historyLength: 2,
+                types : [ "ability", "proficiency", "boost", "challenge", "difficulty", "setback", "force" ],
                 rolls: [
                     {   user: "Inigo",
                         time: moment().subtract(2, 'minutes'),
@@ -171,6 +175,19 @@
                                     Array(Math.abs(despair)).fill("despair"),
                                     Array(Math.abs(advantage)).fill(advantage>0 ? "advantage" : "threat") ].reduce(flatten);
                     return results;
+                },
+                doRoll: function() {
+                    var newValue = { user: "Inigo",
+                        time: Date.now(),
+                        dice: [
+                            { type: "advantage", pips: [ "success", "advantage" ] },
+                            { type: "force", pips: [ "darkside" ] }
+                        ]
+                    };
+                    this.rolls.unshift(newValue);
+                },
+                selectDice: function(type, i) {
+                    console.info("Select dice : "+type+" "+i);
                 }
             }
         });
