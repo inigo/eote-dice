@@ -14,15 +14,6 @@
         .die img { display: block; }
         .die.rolled { width: 12px; height: 12px; margin-right: 2px; }
 
-        .die.advantage { background-image: url("images/results/advantage.svg") }
-        .die.darkside { background-image: url("images/results/darkside.svg") }
-        .die.despair { background: red url("images/results/despair.svg"); }
-        .die.failure { background: red url("images/results/failure.svg"); }
-        .die.lightside { background-image: url("images/results/lightside.svg") }
-        .die.success { background-image: url("images/results/success.svg") }
-        .die.threat { background: red url("images/results/threat.svg"); }
-        .die.triumph { background-image: url("images/results/triumph.svg") }
-
         .die.ability { background: green; }
         .die.proficiency { background: yellow; }
         .die.boost { background: blue; }
@@ -87,6 +78,7 @@
 
     <script type="text/x-template" id="resultdie-template">
         <div class='result die' :class='die'>
+            <img :src="'/images/results/'+die+'.svg'" :width="64" :height="64" />
         </div>
     </script>
 
