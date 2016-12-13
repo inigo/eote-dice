@@ -8,7 +8,7 @@
 
     <title>Star Wars Dice Roller</title>
 
-    <link rel="stylesheet" href="css/bootstrap-flex.css">
+    <link rel="stylesheet" href="stylesheets/bootstrap-flex.css">
 
     <style type="text/css">
         .die { width: 64px; height: 64px; border: solid 1px black; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; }
@@ -87,9 +87,9 @@
         </div>
     </div>
 
-    <script src="javascript/vue.js"></script>
-    <script src="javascript/moment.js"></script>
-    <script src="javascript/axios.min.js"></script>
+    <script src="javascripts/vue.js"></script>
+    <script src="javascripts/moment.js"></script>
+    <script src="javascripts/axios.min.js"></script>
 
     <script type="text/x-template" id="rolleddie-template">
         <div class='rolled die' :class='die.type' :title='die.type'>
@@ -98,14 +98,14 @@
 
     <script type="text/x-template" id="resultdie-template">
         <div class='result die' :class='die'>
-            <img :src="'/images/results/'+die+'.svg'" :width="64" :height="64" />
+            <img :src="'images/results/'+die+'.svg'" :width="64" :height="64" />
         </div>
     </script>
 
     <script type="text/x-template" id="rolldie-template">
         <div class='roll die' :class='die.type'>
             <div>
-                <img :src="'/images/results/'+pip+'.svg'" :width="die.pips.length==1 ? 42 : 28" :height="die.pips.length==1 ? 42 : 28" v-for="pip in die.pips" />
+                <img :src="'images/results/'+pip+'.svg'" :width="die.pips.length==1 ? 42 : 28" :height="die.pips.length==1 ? 42 : 28" v-for="pip in die.pips" />
             </div>
         </div>
     </script>
