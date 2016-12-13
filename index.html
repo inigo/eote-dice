@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<!--suppress HtmlUnknownTag -->
+<html lang="en" xmlns:v-bind="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -109,12 +110,12 @@
         </div>
     </script>
 
-    <script type="text/javascript">
+    <script type="application/javascript">
         Vue.component('resultdie', { props: ['die'], template: "#resultdie-template" });
         Vue.component('rolleddie', { props: ['die'], template: "#rolleddie-template" });
         Vue.component('rolldie', { props: ['die'], template: "#rolldie-template" });
 
-        var vm = new Vue({
+        const vm = new Vue({
             el : "#root",
             data: {
                 name: "A New Hope",
@@ -174,35 +175,34 @@
                 },
                 /* Convert a set of rolls into the aggregate result, cancelling successes with failures and so on. */
                 calculateResults: function(dice) {
-                    var sum = (a, b) => a+b;
-                    var flatten = (a, b) => a.concat(b);
+                    const sum = (a, b) => a+b;
+                    const flatten = (a, b) => a.concat(b);
 
-                    var allPips = dice.map(die => die.pips).reduce(flatten);
+                    const allPips = dice.map(die => die.pips).reduce(flatten);
 
-                    var force = allPips.map(pip => pip==="lightside" ? 1 : pip==="darkside" ? -1 : 0 ).reduce(sum);
-                    var success = allPips.map(pip => (pip==="success" || pip==="triumph") ? 1 : (pip==="failure" || pip==="despair")? -1 : 0 ).reduce(sum);
-                    var advantage = allPips.map(pip => pip==="advantage" ? 1 : pip==="threat" ? -1 : 0 ).reduce(sum);
-                    var triumph = allPips.map(pip => pip==="triumph" ? 1 : 0 ).reduce(sum);
-                    var despair = allPips.map(pip => pip==="despair" ? 1 : 0 ).reduce(sum);
+                    const force = allPips.map(pip => pip==="lightside" ? 1 : pip==="darkside" ? -1 : 0 ).reduce(sum);
+                    const success = allPips.map(pip => (pip==="success" || pip==="triumph") ? 1 : (pip==="failure" || pip==="despair")? -1 : 0 ).reduce(sum);
+                    const advantage = allPips.map(pip => pip==="advantage" ? 1 : pip==="threat" ? -1 : 0 ).reduce(sum);
+                    const triumph = allPips.map(pip => pip==="triumph" ? 1 : 0 ).reduce(sum);
+                    const despair = allPips.map(pip => pip==="despair" ? 1 : 0 ).reduce(sum);
 
-                    var results = [ Array(Math.abs(force)).fill(force>0 ? "lightside" : "darkside"),
-                                    Array(Math.abs(triumph)).fill("triumph"),
-                                    Array(Math.abs(success)).fill(success>0 ? "success" : "failure"),
-                                    Array(Math.abs(despair)).fill("despair"),
-                                    Array(Math.abs(advantage)).fill(advantage>0 ? "advantage" : "threat") ].reduce(flatten);
+                    const results = [ new Array(Math.abs(force)).fill(force>0 ? "lightside" : "darkside"),
+                                    new Array(Math.abs(triumph)).fill("triumph"),
+                                    new Array(Math.abs(success)).fill(success>0 ? "success" : "failure"),
+                                    new Array(Math.abs(despair)).fill("despair"),
+                                    new Array(Math.abs(advantage)).fill(advantage>0 ? "advantage" : "threat") ].reduce(flatten);
                     return results;
                 },
                 doRoll: function() {
-                    var rolls = this.rolls;
                     axios.post('/makeRoll', {
                         value: this.types
                     }).then(function (response) {
                         console.log(response);
-                        rolls = response;
+                        this.rolls = response;
                     });
                 },
                 selectDice: function(type, i) {
-                    var newValue = (type.value === 1 && i === 1) ? 0 : i;
+                    const newValue = (type.value === 1 && i === 1) ? 0 : i;
                     type.value = newValue;
                 }
             }
