@@ -194,11 +194,12 @@
                     return results;
                 },
                 doRoll: function() {
+                    const v = this;
                     axios.post('/makeRoll', {
-                        value: this.types
+                        value: v.types
                     }).then(function (response) {
                         console.log(response);
-                        this.rolls = response;
+                        v.rolls = response.data;
                     });
                 },
                 selectDice: function(type, i) {
