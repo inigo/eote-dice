@@ -4,6 +4,8 @@
 
 GET     /                           controllers.HomeController.index
 GET     /rolls                      controllers.HomeController.rolls
+# Checking for changes is not idempotent, so must be POST not GET
+POST    /rollsIfModified           controllers.HomeController.rollsIfModified(ifChangedSince)
 POST    /makeRoll                   controllers.HomeController.makeRoll
 
 # Map static resources from the /public folder to the /assets URL path

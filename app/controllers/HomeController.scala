@@ -15,9 +15,9 @@ import scala.collection.mutable.ListBuffer
 @Singleton
 class HomeController @Inject() extends Controller {
   import DieTypes._
-  import Results._
 
   val roller = new Roller()
+  val rollsSoFar = new RollsSoFar()
 
   implicit val diceWrites = new Writes[Die] {
     def writes(die: Die): JsObject = Json.obj(
@@ -34,34 +34,58 @@ class HomeController @Inject() extends Controller {
     )
   }
 
-  val previousRolls: ListBuffer[Roll] = ListBuffer(
-    Roll("Inigo", Instant.now(), List(Die(Ability, List(Advantage)), Die(Ability, List(Success, Advantage)))),
-    Roll("Inigo", Instant.now(), List(Die(Proficiency, List(Advantage, Advantage)), Die(Ability, List(Triumph))))
-  )
-
   def index = Action {
     Redirect("/assets/index.html")
   }
 
   def rolls = Action {
-    Ok(Json.toJson(previousRolls.toList.reverse))
+    Ok(Json.toJson(rollsSoFar.getPreviousRolls))
   }
 
   def makeRoll = Action { request =>
-
     val user = currentUser(request)
     val time = Instant.now()
     val dieResults = roller.roll(List(Ability, Proficiency, Difficulty))
     val roll = Roll(user, time, dieResults)
 
-    previousRolls += roll
+    rollsSoFar.addRoll(roll)
 
     Redirect("/rolls")
   }
 
+  /**
+    * Retrieve all the rolls if there are any new ones.
+    *
+    * @param ifChangedSince - expected to be the last modified date previously passed to the client
+    * @return HTTP 200 and all the rolls if modified, or HTTP 304 if not
+    */
+  def rollsIfModified(ifChangedSince: String) = Action {
+    val since = Instant.parse(ifChangedSince)
+    val lastModified = rollsSoFar.lastModified
+    if (lastModified.isAfter(since)) {
+      Ok(Json.toJson(rollsSoFar.getPreviousRolls))
+    } else {
+      NotModified
+    }
+  }
+
   private def currentUser(request: Request[AnyContent]) = "Inigo"
+
 }
 
+class RollsSoFar() {
+  import controllers.DieTypes._
+  import controllers.Results._
+
+  private val previousRolls: ListBuffer[Roll] = ListBuffer(
+    Roll("Inigo", Instant.now(), List(Die(Ability, List(Advantage)), Die(Ability, List(Success, Advantage)))),
+    Roll("Inigo", Instant.now(), List(Die(Proficiency, List(Advantage, Advantage)), Die(Ability, List(Triumph))))
+  )
+
+  def getPreviousRolls: List[Roll] = previousRolls.reverse.toList
+  def addRoll(roll: Roll): Unit = previousRolls += roll
+  def lastModified: Instant = previousRolls.last.time
+}
 
 
 case class Roll(user: String, time: Instant, dice: List[Die])
