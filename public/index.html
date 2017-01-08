@@ -119,9 +119,9 @@
             el : "#root",
             data: {
                 name: "A New Hope",
-                historyLength: 2,
+                historyLength: 10,
                 types : [
-                    { name: "ability", value: 3 },
+                    { name: "ability", value: 0 },
                     { name: "proficiency", value: 0 },
                     { name: "boost", value: 0 },
                     { name: "challenge", value: 0 },
@@ -130,30 +130,9 @@
                     { name: "force", value: 0 }
                 ],
                 rolls: [
-                    {   user: "Inigo",
-                        time: moment().subtract(2, 'minutes'),
-                        dice: [
-                            { type: "ability", pips: [ "advantage", "advantage" ] },
-                            { type: "ability", pips: [ "success" ] },
-                            { type: "proficiency", pips: [ "triumph" ] },
-                            { type: "proficiency", pips: [ "advantage", "success" ] }
-                        ]
-                    },
-                    {   user: "Inigo",
-                        time: moment().subtract(10, 'minutes'),
-                        dice: [
-                            { type: "force", pips: [ "lightside", "lightside" ] },
-                            { type: "force", pips: [ "darkside" ] },
-                            { type: "ability", pips: [ "advantage" ] },
-                            { type: "proficiency", pips: [ "advantage", "success" ] }
-                        ]
-                    },
-                    {   user: "Pete",
-                        time: moment().subtract(66, 'minutes'),
-                        dice: [
-                            { type: "force", pips: [ "darkside", "darkside" ] },
-                            { type: "force", pips: [ "darkside" ] }
-                        ]
+                    {   user: "No rolls made",
+                        time: moment(),
+                        dice: [ ]
                     }
                 ]
             },
@@ -175,6 +154,8 @@
                 },
                 /* Convert a set of rolls into the aggregate result, cancelling successes with failures and so on. */
                 calculateResults: function(dice) {
+                    if (dice.length==0) return [];
+
                     const sum = (a, b) => a+b;
                     const flatten = (a, b) => a.concat(b);
 
