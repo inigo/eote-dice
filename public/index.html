@@ -205,9 +205,22 @@
                 selectDice: function(type, i) {
                     const newValue = (type.value === 1 && i === 1) ? 0 : i;
                     type.value = newValue;
+                },
+                pollForChanges: function() {
+                    console.log("Polling for changes");
+                    const v = this;
+                    const timeZero = "1970-01-01T00:00:00.00Z";
+                    const lastUpdateReceived = this.rolls.length>0 ? moment(this.rolls[0].time).toISOString() : timeZero;
+                    axios.post("/rollsIfModified?ifChangedSince="+lastUpdateReceived).then(function(response) {
+                        console.log("Received response "+response);
+                        v.rolls = response.data;
+                    });
                 }
             }
         });
+
+        setInterval(vm.pollForChanges, 500);
+
     </script>
 </body>
 </html>
