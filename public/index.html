@@ -177,12 +177,16 @@
                 doRoll: function() {
                     const v = this;
                     const currentUser = document.getElementById("currentUser").value;
-                    axios.post('/makeRoll?currentUser='+currentUser, {
-                        value: v.types
-                    }).then(function (response) {
-                        console.log(response);
-                        v.rolls = response.data;
-                    });
+                    const sum = (a, b) => a+b;
+                    const selectedDiceCount = this.types.map( t => t.value ).reduce(sum)
+                    if (selectedDiceCount > 0) {
+                        axios.post('/makeRoll?currentUser=' + currentUser, {
+                            value: v.types
+                        }).then(function (response) {
+                            console.log(response);
+                            v.rolls = response.data;
+                        });
+                    }
                 },
                 selectDice: function(type, i) {
                     const newValue = (type.value === 1 && i === 1) ? 0 : i;
