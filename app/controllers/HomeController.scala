@@ -14,7 +14,6 @@ import scala.collection.mutable.ListBuffer
  */
 @Singleton
 class HomeController @Inject() extends Controller {
-  import DieTypes._
 
   val roller = new Roller()
   val rollsSoFar = new RollsSoFar()
@@ -42,10 +41,14 @@ class HomeController @Inject() extends Controller {
     Ok(Json.toJson(rollsSoFar.getPreviousRolls))
   }
 
-  def makeRoll = Action { request =>
+  def makeRoll: Action[JsValue] = Action(parse.json) { request =>
     val user = currentUser(request)
     val time = Instant.now()
-    val dieResults = roller.roll(List(Ability, Proficiency, Difficulty))
+
+    val diceValue = (request.body \ "value").get.toString()
+    val dieTypes = DieTypeParser.parse(diceValue)
+
+    val dieResults = roller.roll(dieTypes)
     val roll = Roll(user, time, dieResults)
 
     rollsSoFar.addRoll(roll)
@@ -69,18 +72,27 @@ class HomeController @Inject() extends Controller {
     }
   }
 
-  private def currentUser(request: Request[AnyContent]) = request.getQueryString("currentUser").getOrElse("Unknown")
+  private def currentUser(request: Request[_]) = request.getQueryString("currentUser").getOrElse("Unknown")
+
+}
+
+object DieTypeParser {
+
+  def parse(jsonString: String): List[DieTypes.DieType] = {
+    val json: JsValue = Json.parse(jsonString)
+    val dieTypes = for (js <- json.asInstanceOf[JsArray].value) yield {
+      val name = (js \ "name").get.asInstanceOf[JsString].value
+      val count = (js \ "value").get.asInstanceOf[JsNumber].value.toInt
+      val dieType = DieTypes.toDieType(name)
+      List.fill(count)(dieType)
+    }
+    dieTypes.flatten.toList
+  }
 
 }
 
 class RollsSoFar() {
-  import controllers.DieTypes._
-  import controllers.Results._
-
-  private val previousRolls: ListBuffer[Roll] = ListBuffer(
-    Roll("Inigo", Instant.now(), List(Die(Ability, List(Advantage)), Die(Ability, List(Success, Advantage)))),
-    Roll("Inigo", Instant.now(), List(Die(Proficiency, List(Advantage, Advantage)), Die(Ability, List(Triumph))))
-  )
+  private val previousRolls: ListBuffer[Roll] = ListBuffer()
 
   def getPreviousRolls: List[Roll] = previousRolls.reverse.toList
   def addRoll(roll: Roll): Unit = previousRolls += roll
@@ -114,4 +126,7 @@ object DieTypes {
   case object Difficulty extends DieType("difficulty")
   case object Setback extends DieType("setback")
   case object Force extends DieType("force")
+
+  private val DieTypes = List(Ability, Proficiency, Boost, Challenge, Difficulty, Setback, Force)
+  def toDieType(name: String): DieType = DieTypes.find(_.name == name).get
 }
