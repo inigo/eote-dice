@@ -3,11 +3,11 @@ package controllers
 import java.time.Instant
 import javax.inject._
 
+import net.surguy.eote.Roller
 import play.api.libs.json._
 import play.api.mvc._
 
 import scala.collection.mutable.ListBuffer
-import scala.util.Random
 
 /**
  * Return dice values.
@@ -62,36 +62,7 @@ class HomeController @Inject() extends Controller {
   private def currentUser(request: Request[AnyContent]) = "Inigo"
 }
 
-class Roller {
 
-  import DieTypes._
-  import Results._
-
-  val dieSides: Map[DieType, List[List[Result]]] = Map(
-    Proficiency -> List( ds(), ds(Success), ds(Success), ds(Success, Success), ds(Success, Success), ds(Advantage),
-      ds(Advantage, Success), ds(Advantage, Success), ds(Advantage, Success), ds(Advantage, Advantage), ds(Advantage, Advantage), ds(Triumph)),
-    Ability -> List( ds(), ds(Success), ds(Success), ds(Success, Success), ds(Advantage), ds(Advantage), ds(Success, Advantage), ds(Advantage, Advantage)),
-    Boost -> List(ds(), ds(), ds(Advantage, Advantage), ds(Advantage), ds(Success, Advantage), ds(Success)),
-    Challenge -> List(ds(), ds(Failure), ds(Failure), ds(Failure, Failure), ds(Failure, Failure), ds(Threat), ds(Threat), ds(Failure, Threat),
-      ds(Failure, Threat), ds(Threat, Threat), ds(Threat, Threat), ds(Despair)),
-    Difficulty -> List(ds(), ds(Failure), ds(Failure,Failure), ds(Threat), ds(Threat), ds(Threat), ds(Threat, Threat), ds(Failure, Threat)),
-    Setback -> List(ds(), ds(), ds(Failure), ds(Failure), ds(Threat), ds(Threat)),
-    Force -> List(ds(Darkside), ds(Darkside), ds(Darkside), ds(Darkside), ds(Darkside), ds(Darkside), ds(Darkside, Darkside),
-      ds(Lightside), ds(Lightside), ds(Lightside, Lightside), ds(Lightside, Lightside), ds(Lightside, Lightside))
-  )
-
-  private def ds(types: Result*): List[Result] = types.toList
-
-  def roll(dice: List[DieType]): List[Die] = {
-    dice.map(roll)
-  }
-
-  private def roll(die: DieType): Die = {
-    val options = dieSides(die)
-    val pips = options(Random.nextInt(options.size))
-    Die(die, pips)
-  }
-}
 
 case class Roll(user: String, time: Instant, dice: List[Die])
 case class Die(dieType: DieTypes.DieType, pips: List[Results.Result])
