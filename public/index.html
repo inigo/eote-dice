@@ -35,7 +35,7 @@
     <div class="container-fluid" id="root">
         <div class="row">
             <div class="col-md">
-                <h1>{{ name }}</h1>
+                <h1>{{ name }} - <input type="text" value="Someone" id="currentUser"></h1>
             </div>
         </div>
 
@@ -195,7 +195,8 @@
                 },
                 doRoll: function() {
                     const v = this;
-                    axios.post('/makeRoll', {
+                    const currentUser = document.getElementById("currentUser").value;
+                    axios.post('/makeRoll?currentUser='+currentUser, {
                         value: v.types
                     }).then(function (response) {
                         console.log(response);

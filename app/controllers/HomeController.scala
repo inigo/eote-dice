@@ -69,7 +69,7 @@ class HomeController @Inject() extends Controller {
     }
   }
 
-  private def currentUser(request: Request[AnyContent]) = "Inigo"
+  private def currentUser(request: Request[AnyContent]) = request.getQueryString("currentUser").getOrElse("Unknown")
 
 }
 
