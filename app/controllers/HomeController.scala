@@ -64,11 +64,11 @@ class HomeController @Inject() extends Controller {
     */
   def rollsIfModified(ifChangedSince: String) = Action {
     val since = Instant.parse(ifChangedSince)
-    val lastModified = rollsSoFar.lastModified
-    if (lastModified.isAfter(since)) {
-      Ok(Json.toJson(rollsSoFar.getPreviousRolls))
-    } else {
-      NotModified
+    rollsSoFar.lastModified match {
+      case Some(lastModified) if lastModified.isAfter(since) =>
+        Ok(Json.toJson(rollsSoFar.getPreviousRolls))
+      case _ =>
+        NotModified
     }
   }
 
@@ -96,7 +96,7 @@ class RollsSoFar() {
 
   def getPreviousRolls: List[Roll] = previousRolls.reverse.toList
   def addRoll(roll: Roll): Unit = previousRolls += roll
-  def lastModified: Instant = previousRolls.last.time
+  def lastModified: Option[Instant] = previousRolls.lastOption.map(_.time)
 }
 
 
