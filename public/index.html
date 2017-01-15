@@ -128,7 +128,7 @@
             el : "#root",
             data: {
                 name: "A New Hope",
-                currentUser: "Someone",
+                currentUser: localStorage.getItem("currentUser") ? localStorage.getItem("currentUser") : "Someone",
                 historyLength: 10,
                 types : [
                     { name: "ability", value: 0 },
@@ -154,6 +154,11 @@
                 lastRoll: function() {
                     const roll = this.rolls.find( r => r.user == this.currentUser );
                     return (roll) ? roll.dice : [ ];
+                }
+            },
+            watch: {
+                currentUser: function (val) {
+                    localStorage.setItem("currentUser", val);
                 }
             },
             methods: {
