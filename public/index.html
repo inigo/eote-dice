@@ -52,6 +52,7 @@
                     </div>
 
                     <button class="btn rollButton" @click="doRoll">Roll!</button>
+                    <button class="btn clearButton" @click="reset">Reset</button>
                 </div>
 
                 <div class="dice">
@@ -189,6 +190,9 @@
                             this.rolls = response.data;
                         });
                     }
+                },
+                reset: function() {
+                  this.types.forEach(t => t.value = 0);
                 },
                 selectDice: function(type, i) {
                     const newValue = (type.value === 1 && i === 1) ? 0 : i;
