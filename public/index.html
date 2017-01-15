@@ -35,7 +35,7 @@
     <div class="container-fluid" id="root">
         <div class="row">
             <div class="col-md">
-                <h1>{{ name }} - <input type="text" value="Someone" id="currentUser"></h1>
+                <h1>{{ name }} - <input type="text" v-model="currentUser"></h1>
             </div>
         </div>
 
@@ -56,10 +56,10 @@
 
                 <div class="dice">
                     <h3>Roll</h3>
-                    <rolldie v-bind:die="die" v-for="die in rolls[0].dice"></rolldie>
+                    <rolldie v-bind:die="die" v-for="die in lastRoll"></rolldie>
 
                     <h3>Results</h3>
-                    <resultdie v-bind:die="die" v-for="die in calculateResults(rolls[0].dice)"></resultdie>
+                    <resultdie v-bind:die="die" v-for="die in calculateResults(lastRoll)"></resultdie>
                 </div>
             </div>
 
@@ -119,6 +119,7 @@
             el : "#root",
             data: {
                 name: "A New Hope",
+                currentUser: "Someone",
                 historyLength: 10,
                 types : [
                     { name: "ability", value: 0 },
@@ -131,7 +132,7 @@
                 ],
                 rolls: [
                     {   user: "No rolls made",
-                        time: moment(),
+                        time: moment("1970-01-01T00:00:00.00Z"),
                         dice: [ ]
                     }
                 ]
@@ -140,6 +141,10 @@
                 /* Work out the list of unique users based on those that have made rolls. */
                 users: function() {
                     return Array.from(new Set(this.rolls.map(roll => roll.user).sort()));
+                },
+                lastRoll: function() {
+                    const roll = this.rolls.find( r => r.user == this.currentUser );
+                    return (roll) ? roll.dice : [ ];
                 }
             },
             methods: {
@@ -175,16 +180,13 @@
                     return results;
                 },
                 doRoll: function() {
-                    const v = this;
-                    const currentUser = document.getElementById("currentUser").value;
                     const sum = (a, b) => a+b;
-                    const selectedDiceCount = this.types.map( t => t.value ).reduce(sum)
+                    const selectedDiceCount = this.types.map( t => t.value ).reduce(sum);
                     if (selectedDiceCount > 0) {
-                        axios.post('/makeRoll?currentUser=' + currentUser, {
-                            value: v.types
-                        }).then(function (response) {
-                            console.log(response);
-                            v.rolls = response.data;
+                        axios.post('/makeRoll?currentUser=' + this.currentUser, {
+                            value: this.types
+                        }).then((response) => {
+                            this.rolls = response.data;
                         });
                     }
                 },
@@ -194,13 +196,11 @@
                 },
                 pollForChanges: function() {
                     console.log("Polling for changes");
-                    const v = this;
-                    const timeZero = "1970-01-01T00:00:00.00Z";
-                    const lastUpdateReceived = this.rolls.length>0 ? moment(this.rolls[0].time).toISOString() : timeZero;
-                    axios.post("/rollsIfModified?ifChangedSince="+lastUpdateReceived).then(function(response) {
-                        console.log("Received response "+response);
-                        v.rolls = response.data;
-                    });
+                    const lastUpdateReceived = moment(this.rolls[0].time).toISOString();
+                    axios.post("/rollsIfModified?ifChangedSince="+lastUpdateReceived).then((response) => {
+                        console.log("Received response "+response.data);
+                        this.rolls = response.data;
+                    }).catch((thrown) => { /* Ignore error - expecting 304 if there are no changes */ });
                 }
             }
         });

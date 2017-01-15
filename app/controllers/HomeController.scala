@@ -64,10 +64,13 @@ class HomeController @Inject() extends Controller {
     */
   def rollsIfModified(ifChangedSince: String) = Action {
     val since = Instant.parse(ifChangedSince)
+    println("Checking for changes since "+since)
     rollsSoFar.lastModified match {
       case Some(lastModified) if lastModified.isAfter(since) =>
+        println(s"Last modified at $lastModified isAfter $since")
         Ok(Json.toJson(rollsSoFar.getPreviousRolls))
       case _ =>
+        println(s"Not modified")
         NotModified
     }
   }
