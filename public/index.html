@@ -11,15 +11,19 @@
     <link rel="stylesheet" href="stylesheets/bootstrap-flex.css">
 
     <style type="text/css">
-        .die { width: 64px; height: 64px; border: solid 1px black; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; }
+        .die { width: 64px; height: 64px; border: solid 1px #666; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px; }
         .die img { display: block; }
         .die.rolled { width: 12px; height: 12px; margin-right: 2px; }
         .die.toRoll { width: 24px; height: 24px; cursor: pointer; }
+        .die.toRoll { border-radius: 20px;  box-shadow: 2px 2px 4px #666; }
         .die.toRoll.active { box-shadow: inset 4px 4px 4px #333; }
+
+        .rollButton { margin-left: 25px; display: inline-block;  }
+        .diceButtons { margin-top: 20px; margin-bottom: 20px; }
 
         .die.ability { background: green; }
         .die.proficiency { background: yellow; }
-        .die.boost { background: blue; }
+        .die.boost { background: #3080ff; }
         .die.challenge { background: red; }
         .die.difficulty { background: purple; }
         .die.setback { background: #666666; }
@@ -51,8 +55,10 @@
                         <div class="die toRoll" :class="[ type.name, { active: isActive(type.value, i) }]" @click="selectDice(type, i)" v-for="i in [1,2,3,4,5]"></div>
                     </div>
 
-                    <button class="btn rollButton" @click="doRoll">Roll!</button>
-                    <button class="btn clearButton" @click="reset">Reset</button>
+                    <div class="diceButtons">
+                        <button class="btn clearButton float-right" @click="reset">Reset</button>
+                        <button class="btn rollButton btn-primary" @click="doRoll">Roll!</button>
+                    </div>
                 </div>
 
                 <div class="dice">
