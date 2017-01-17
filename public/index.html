@@ -69,13 +69,19 @@
 
                     <h3>Results</h3>
                     <resultdie v-bind:die="die" v-for="die in calculateResults(lastRoll)"></resultdie>
+
+                    <h3>Your recent rolls</h3>
+                    <div v-for="roll in rollsFor(currentUser)" @click="setDiceToRoll(roll)">
+                        <rolleddie v-bind:die="die" v-for="die in roll.dice"></rolleddie>
+                    </div>
+
                 </div>
             </div>
 
             <div class="col-sm">
                 <h2>Everyone's last result</h2>
                 <div class="user" v-for="user in users">
-                    <h3>{{ user }} <rolleddie v-bind:die="die" v-for="die in rollsFor(user)[0].dice"></rolleddie></h3>
+                    <h3>{{ user }} <span @click="setDiceToRoll(rollsFor(user)[0])"><rolleddie v-bind:die="die" v-for="die in rollsFor(user)[0].dice"></rolleddie></span></h3>
                     <resultdie v-bind:die="roll" v-for="roll in calculateResults(rollsFor(user)[0].dice)"></resultdie>
                 </div>
             </div>
@@ -87,7 +93,7 @@
                     <h2>History</h2>
                     <transition-group name="history-transition" tag="div">
                         <div class="roll" v-for="roll in rolls.slice(0,historyLength)" v-bind:key="roll.time">
-                            <div><b>{{ roll.user }}</b> — {{ timeSince(roll.time) }} — <rolleddie v-bind:die="die" v-for="die in roll.dice"></rolleddie></div>
+                            <div><b>{{ roll.user }}</b> — {{ timeSince(roll.time) }} — <span @click="setDiceToRoll(roll)"><rolleddie v-bind:die="die" v-for="die in roll.dice"></rolleddie></span></div>
                             <div><resultdie v-bind:die="die" v-for="die in calculateResults(roll.dice)"></resultdie></div>
                         </div>
                     </transition-group>
@@ -203,6 +209,9 @@
                             this.rolls = response.data;
                         });
                     }
+                },
+                setDiceToRoll: function(roll) {
+                    this.types.forEach(t => t.value = roll.dice.filter(d => d.type == t.name).length );
                 },
                 reset: function() {
                   this.types.forEach(t => t.value = 0);
