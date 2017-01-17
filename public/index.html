@@ -71,7 +71,7 @@
                     <resultdie v-bind:die="die" v-for="die in calculateResults(lastRoll)"></resultdie>
 
                     <h3>Your recent rolls</h3>
-                    <div v-for="roll in rollsFor(currentUser)" @click="setDiceToRoll(roll)">
+                    <div v-for="roll in rollsFor(currentUser).slice(0,historyLength)" @click="setDiceToRoll(roll)">
                         <rolleddie v-bind:die="die" v-for="die in roll.dice"></rolleddie>
                     </div>
 
